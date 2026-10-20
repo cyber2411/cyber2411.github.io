@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex Business Dashboard — Demo App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1222; --navy-2:#0E1730; --navy-3:#111C38;
+    --card:#0F1930;
+    --line:rgba(255,255,255,.08);
+    --teal:#2EDAC5; --teal-dim:rgba(46,218,197,.12);
+    --gold:#F4C95D;
+    --text:#E8ECF4; --muted:#93A1BC; --muted-2:#5F6E8C;
+    --red:#FF7A7A; --red-dim:rgba(255,122,122,.12);
+    --amber:#FFC46B; --amber-dim:rgba(255,196,107,.12);
+    --green:#4ADE80; --green-dim:rgba(74,222,128,.12);
+    --radius:15px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,sans-serif; background:var(--navy); color:var(--text);
+    font-size:14.5px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.brand-name{font-family:'Sora',sans-serif}
+  button,input,select{font-family:inherit;font-size:14px;color:var(--text)}
+  ::selection{background:rgba(46,218,197,.3)}
+
+  .app{display:flex;min-height:100vh}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:238px;flex-shrink:0;background:var(--navy-2);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;padding:26px 16px 20px;position:sticky;top:0;height:100vh;
+  }
+  .brand{display:flex;align-items:center;gap:11px;padding:0 8px 24px}
+  .brand-mark{
+    width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--teal),#1B9E8F);
+    display:flex;align-items:center;justify-content:center;font-family:'Sora';font-weight:800;
+    font-size:19px;color:#06231F;flex-shrink:0;
+  }
+  .brand-name{font-size:16.5px;font-weight:700;letter-spacing:.2px;line-height:1.15}
+  .brand-sub{font-size:11px;color:var(--muted-2);font-weight:500;letter-spacing:.4px;text-transform:uppercase}
+  .nav-label{font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted-2);padding:14px 10px 8px;font-weight:600}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;padding:10.5px 12px;border-radius:10px;color:var(--muted);
+    font-weight:500;cursor:pointer;border:1px solid transparent;margin-bottom:3px;transition:all .15s;
+    background:none;width:100%;text-align:left;font-size:14.5px;
+  }
+  .nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.85}
+  .nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+  .nav-item.active{color:var(--text);background:var(--teal-dim);border-color:rgba(46,218,197,.25)}
+  .nav-item.active svg{color:var(--teal);opacity:1}
+  .nav-badge{margin-left:auto;background:var(--teal);color:#06231F;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px}
+  .sidebar-foot{margin-top:auto;border-top:1px solid var(--line);padding-top:16px}
+  .user-chip{display:flex;align-items:center;gap:10px;padding:4px 8px}
+  .avatar{
+    width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2A3B63,#16233F);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+    font-family:'Sora';font-weight:700;font-size:12.5px;color:var(--teal);flex-shrink:0;
+  }
+  .user-chip .u-name{font-size:13.5px;font-weight:600;line-height:1.2}
+  .user-chip .u-role{font-size:11.5px;color:var(--muted-2)}
+
+  /* ---------- Main ---------- */
+  .main{flex:1;min-width:0;padding:30px 34px 44px;max-width:1240px;margin:0 auto;width:100%}
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+  .topbar h1{font-size:25px;font-weight:700;letter-spacing:-.2px}
+  .topbar .sub{color:var(--muted);font-size:13.5px;margin-top:3px}
+  .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .demo-badge{
+    display:inline-flex;align-items:center;gap:7px;background:var(--amber-dim);color:var(--amber);
+    border:1px solid rgba(255,196,107,.35);border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:600;
+  }
+  .demo-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--amber)}
+  .btn{
+    border-radius:10px;padding:9.5px 16px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--navy-3);transition:all .15s;display:inline-flex;align-items:center;gap:7px;
+  }
+  .btn:hover{border-color:rgba(255,255,255,.2)}
+  .btn-teal{background:var(--teal);border-color:var(--teal);color:#06231F}
+  .btn-teal:hover{background:#45E5D2;border-color:#45E5D2}
+
+  /* KPI cards */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 17px}
+  .kpi .k-label{font-size:12px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:8px}
+  .kpi .k-label .k-ic{width:26px;height:26px;border-radius:8px;background:var(--teal-dim);color:var(--teal);display:flex;align-items:center;justify-content:center}
+  .kpi .k-label .k-ic svg{width:14px;height:14px}
+  .kpi .k-value{font-family:'Sora';font-size:29px;font-weight:700;margin-top:11px;letter-spacing:-.3px}
+  .kpi .k-note{font-size:12.5px;color:var(--muted-2);margin-top:3px}
+  .kpi .k-note b{color:var(--green);font-weight:600}
+  .kpi.warn .k-value{color:var(--amber)}
+
+  /* Panels */
+  .grid-2{display:grid;grid-template-columns:1.65fr 1fr;gap:16px;margin-bottom:18px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .panel-head h3{font-size:16px;font-weight:600}
+  .panel-head .p-sub{font-size:12.5px;color:var(--muted-2)}
+  canvas#revChart{width:100%;height:230px;display:block;margin-top:10px}
+
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:10px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+
+  /* Inventory */
+  .inv-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .inv-row:last-child{border-bottom:none;padding-bottom:2px}
+  .inv-thumb{width:38px;height:38px;border-radius:10px;background:var(--navy-3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+  .inv-info{flex:1;min-width:0}
+  .inv-name{font-weight:600;font-size:13.8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .inv-sku{font-size:11.8px;color:var(--muted-2)}
+  .inv-stock{text-align:right}
+  .inv-stock .s-num{font-family:'Sora';font-weight:700;font-size:15px}
+  .inv-stock .s-lab{font-size:11px;color:var(--muted-2)}
+  .stock-pill{font-size:11px;font-weight:700;border-radius:999px;padding:2.5px 9px;white-space:nowrap}
+  .stock-ok{background:var(--green-dim);color:var(--green)}
+  .stock-low{background:var(--red-dim);color:var(--red)}
+  .inv-row.low .s-num{color:var(--red)}
+
+  /* Orders */
+  .orders-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  table{width:100%;border-collapse:collapse}
+  th{ text-align:left;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted-2);font-weight:600;
+      padding:10px 12px;border-bottom:1px solid var(--line)}
+  td{padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tbody tr{transition:background .12s}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  .o-id{font-weight:600;color:var(--teal);font-size:13.5px}
+  .o-cust{font-weight:600}
+  .o-items{color:var(--muted);font-size:13px}
+  .o-total{font-family:'Sora';font-weight:600}
+  .status-select{
+    appearance:none;-webkit-appearance:none;border-radius:999px;padding:5px 26px 5px 12px;font-size:12.5px;font-weight:600;
+    cursor:pointer;border:1px solid;outline:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6' viewBox='0 0 9 6'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%2393A1BC' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 10px center;
+  }
+  .st-Paid{background:var(--green-dim);color:var(--green);border-color:rgba(74,222,128,.35)}
+  .st-Pending{background:var(--amber-dim);color:var(--amber);border-color:rgba(255,196,107,.35)}
+  .st-Shipped{background:var(--teal-dim);color:var(--teal);border-color:rgba(46,218,197,.35)}
+  .st-Cancelled{background:var(--red-dim);color:var(--red);border-color:rgba(255,122,122,.35)}
+  .table-foot{display:flex;justify-content:space-between;align-items:center;padding-top:14px;font-size:13px;color:var(--muted)}
+  .table-foot b{color:var(--text);font-family:'Sora'}
+
+  /* Add order form */
+  .add-form{
+    display:none;grid-template-columns:1.2fr 1.6fr .7fr .9fr auto;gap:10px;margin-bottom:16px;
+    background:var(--navy-2);border:1px solid rgba(46,218,197,.3);border-radius:12px;padding:14px;
+  }
+  .add-form.open{display:grid}
+  .add-form input,.add-form select{
+    background:var(--navy);border:1px solid var(--line);border-radius:9px;padding:9.5px 12px;outline:none;width:100%;
+  }
+  .add-form input:focus,.add-form select:focus{border-color:var(--teal)}
+  .add-form input::placeholder{color:var(--muted-2)}
+
+  /* Simple panels */
+  .simple-panel{display:none}
+  .simple-panel.active{display:block}
+  .view{display:none}
+  .view.active{display:block}
+  .empty-note{
+    background:var(--card);border:1px dashed rgba(255,255,255,.16);border-radius:var(--radius);
+    padding:44px 30px;text-align:center;color:var(--muted);
+  }
+  .empty-note h3{color:var(--text);font-size:17px;margin-bottom:6px}
+  .cust-row{display:flex;align-items:center;gap:13px;padding:14px 4px;border-bottom:1px solid var(--line)}
+  .cust-row:last-child{border-bottom:none}
+  .cust-info{flex:1}
+  .cust-name{font-weight:600}
+  .cust-meta{font-size:12.5px;color:var(--muted-2)}
+  .cust-spent{font-family:'Sora';font-weight:600}
+  .set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 4px;border-bottom:1px solid var(--line)}
+  .set-row:last-child{border-bottom:none}
+  .set-row .s-name{font-weight:600}
+  .set-row .s-desc{font-size:12.8px;color:var(--muted-2)}
+  .toggle{width:44px;height:24px;border-radius:999px;background:var(--navy-3);border:1px solid var(--line);position:relative;cursor:pointer;flex-shrink:0;transition:background .15s}
+  .toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:all .15s}
+  .toggle.on{background:rgba(46,218,197,.35);border-color:var(--teal)}
+  .toggle.on::after{left:22px;background:var(--teal)}
+
+  .toast{
+    position:fixed;bottom:26px;right:26px;background:var(--navy-3);border:1px solid rgba(46,218,197,.45);color:var(--text);
+    padding:13px 18px;border-radius:12px;font-size:13.8px;font-weight:500;box-shadow:0 14px 40px rgba(0,0,0,.45);
+    opacity:0;transform:translateY(10px);pointer-events:none;transition:all .25s;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateY(0)}
+  .footer-note{margin-top:22px;font-size:12px;color:var(--muted-2);text-align:center}
+
+  @media (max-width:1020px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .grid-2{grid-template-columns:1fr}
+    .add-form{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:720px){
+    .sidebar{display:none}
+    .main{padding:22px 16px 36px}
+    .kpis{grid-template-columns:1fr}
+    .table-wrap{overflow-x:auto}
+    table{min-width:640px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div>
+        <div class="brand-name">Apex Digital</div>
+        <div class="brand-sub">Business OS</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Menu</div>
+    <button class="nav-item active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7.5" height="9" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="5.5" rx="1.5"/><rect x="13.5" y="12" width="7.5" height="9" rx="1.5"/><rect x="3" y="15.5" width="7.5" height="5.5" rx="1.5"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" data-view="orders">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 12.2a1.5 1.5 0 0 1-1.5 1.3H6.3a1.5 1.5 0 0 1-1.5-1.3L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>
+      Orders
+      <span class="nav-badge" id="navOrderCount">8</span>
+    </button>
+    <button class="nav-item" data-view="inventory">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.2v7.6a2 2 0 0 1-1 1.7l-7 3.5a2 2 0 0 1-1.8 0l-7-3.5A2 2 0 0 1 3 15.8V8.2a2 2 0 0 1 1-1.7l7-3.5a2 2 0 0 1 1.8 0l7 3.5a2 2 0 0 1 1 1.7Z"/><path d="m3.3 8 8.7 4.4L20.7 8"/><path d="M12 22V12"/></svg>
+      Inventory
+    </button>
+    <button class="nav-item" data-view="customers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M3.5 20c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M16 5.4a3.5 3.5 0 0 1 0 5.9M17.8 15.4c1.6.7 2.5 2.2 2.8 4.6"/></svg>
+      Customers
+    </button>
+    <button class="nav-item" data-view="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.51 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.24.6.86 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1Z"/></svg>
+      Settings
+    </button>
+
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">SA</div>
+        <div>
+          <div class="u-name">Syed Areeb Ali</div>
+          <div class="u-role">Owner · Apex Digital</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- ======== DASHBOARD VIEW ======== -->
+    <section class="view active" id="view-dashboard">
+      <div class="topbar">
+        <div>
+          <h1>Good morning, Areeb</h1>
+          <p class="sub">Here's what's happening across your store today.</p>
+        </div>
+        <div class="top-actions">
+          <span class="demo-badge"><span class="dot"></span>Demo app — sample data</span>
+          <button class="btn btn-teal" id="jumpAddOrder">+ New order</button>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="k-label"><span class="k-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M17 5.5c-.8-1-2.6-1.6-5-1.6-3 0-5 1.3-5 3.4 0 4.7 10 2.5 10 7.1 0 2.1-2 3.4-5 3.4-2.4 0-4.2-.7-5-1.8"/></svg></span>Revenue</div>
+          <div class="k-value" id="kpiRevenue">$0</div>
+          <div class="k-note">from paid &amp; shipped orders</div>
+        </div>
+        <div class="kpi">
+          <div class="k-label"><span class="k-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 12.2a1.5 1.5 0 0 1-1.5 1.3H6.3a1.5 1.5 0 0 1-1.5-1.3L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg></span>Orders</div>
+          <div class="k-value" id="kpiOrders">0</div>
+          <div class="k-note"><b id="kpiPendingNote">0 pending</b> &nbsp;awaiting payment</div>
+        </div>
+        <div class="kpi warn">
+          <div class="k-label"><span class="k-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></span>Low-stock items</div>
+          <div class="k-value" id="kpiLowStock">0</div>
+          <div class="k-note">at or below reorder level</div>
+        </div>
+        <div class="kpi">
+          <div class="k-label"><span class="k-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2.5"/><path d="M8 2.5V6M16 2.5V6M3 9.5h18M9 15.5l2 2 4-4.5"/></svg></span>Pending tasks</div>
+          <div class="k-value" id="kpiTasks">5</div>
+          <div class="k-note">orders to pack, invoices to send</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Revenue — last 7 days</h3>
+              <span class="p-sub">Paid &amp; shipped order totals per day</span>
+            </div>
+            <span class="p-sub" id="chartTotal"></span>
+          </div>
+          <canvas id="revChart"></canvas>
+          <div class="legend">
+            <span><i style="background:#2EDAC5"></i>Daily revenue</span>
+            <span><i style="background:rgba(46,218,197,.25)"></i>7-day average</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Inventory health</h3>
+              <span class="p-sub">Stock levels vs. reorder point</span>
+            </div>
+          </div>
+          <div id="invListDash"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="orders-head">
+          <div>
+            <h3 style="font-size:16px">Recent orders</h3>
+            <span class="p-sub" style="font-size:12.5px;color:var(--muted-2)">Change a status — totals update instantly</span>
+          </div>
+          <button class="btn" id="toggleFormBtn">+ Add order</button>
+        </div>
+
+        <form class="add-form" id="addOrderForm">
+          <input type="text" id="fCustomer" placeholder="Customer name" required>
+          <select id="fProduct"></select>
+          <input type="number" id="fQty" placeholder="Qty" min="1" value="1" required>
+          <select id="fStatus">
+            <option>Pending</option>
+            <option>Paid</option>
+            <option>Shipped</option>
+            <option>Cancelled</option>
+          </select>
+          <button type="submit" class="btn btn-teal">Add</button>
+        </form>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Order</th><th>Customer</th><th>Items</th><th>Date</th><th>Status</th><th style="text-align:right">Total</th></tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+        <div class="table-foot">
+          <span id="orderCountLabel">8 orders</span>
+          <span>Collected revenue: <b id="footRevenue">$0</b></span>
+        </div>
+      </div>
+
+      <p class="footer-note">Apex Business Dashboard — a working demo built by Syed Areeb Ali (Apex Digital). All names, orders and figures on this page are sample data.</p>
+    </section>
+
+    <!-- ======== ORDERS VIEW ======== -->
+    <section class="view" id="view-orders">
+      <div class="topbar">
+        <div>
+          <h1>Orders</h1>
+          <p class="sub">Every order lives on the Dashboard in this demo — jump back to manage them.</p>
+        </div>
+        <span class="demo-badge"><span class="dot"></span>Demo app — sample data</span>
+      </div>
+      <div class="empty-note">
+        <h3>Orders are managed on the Dashboard</h3>
+        <p>This demo keeps one live orders table: add orders, change statuses and watch the KPIs react — all on the Dashboard tab.</p>
+        <p style="margin-top:16px"><button class="btn btn-teal" data-goto="dashboard">Go to Dashboard</button></p>
+      </div>
+    </section>
+
+    <!-- ======== INVENTORY VIEW ======== -->
+    <section class="view" id="view-inventory">
+      <div class="topbar">
+        <div>
+          <h1>Inventory</h1>
+          <p class="sub">Full stock list. Items at or below their reorder level are flagged red.</p>
+        </div>
+        <span class="demo-badge"><span class="dot"></span>Demo app — sample data</span>
+      </div>
+      <div class="panel">
+        <div id="invListFull"></div>
+      </div>
+    </section>
+
+    <!-- ======== CUSTOMERS VIEW ======== -->
+    <section class="view" id="view-customers">
+      <div class="topbar">
+        <div>
+          <h1>Customers</h1>
+          <p class="sub">Built automatically from the orders in this demo.</p>
+        </div>
+        <span class="demo-badge"><span class="dot"></span>Demo app — sample data</span>
+      </div>
+      <div class="panel"><div id="custList"></div></div>
+    </section>
+
+    <!-- ======== SETTINGS VIEW ======== -->
+    <section class="view" id="view-settings">
+      <div class="topbar">
+        <div>
+          <h1>Settings</h1>
+          <p class="sub">Workspace preferences for this demo store.</p>
+        </div>
+        <span class="demo-badge"><span class="dot"></span>Demo app — sample data</span>
+      </div>
+      <div class="panel">
+        <div class="set-row">
+          <div><div class="s-name">Low-stock email alerts</div><div class="s-desc">Email the owner when an item hits its reorder level.</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="set-row">
+          <div><div class="s-name">Auto-send invoices</div><div class="s-desc">Send a PDF invoice as soon as an order is marked Paid.</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="set-row">
+          <div><div class="s-name">Weekly revenue report</div><div class="s-desc">A Monday-morning summary of sales, orders and stock risks.</div></div>
+          <div class="toggle" data-toggle></div>
+        </div>
+        <div class="set-row">
+          <div><div class="s-name">Store currency</div><div class="s-desc">All prices and totals in this demo are shown in USD.</div></div>
+          <span style="font-weight:600;color:var(--muted)">USD $</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------------- Sample data ---------------- */
+  var PRODUCTS = [
+    { id:'P-101', name:'Notion Client Portal Template', sku:'NTP-001', icon:'🗂️', price:49,  stock:999, reorder:50 },
+    { id:'P-102', name:'Home Bakery Pricing Calculator', sku:'HBC-014', icon:'🧁', price:29,  stock:999, reorder:50 },
+    { id:'P-103', name:'Inventory Tracker Spreadsheet', sku:'INV-220', icon:'📦', price:39,  stock:4,   reorder:10 },
+    { id:'P-104', name:'Branded Logo Design Pack', sku:'DSN-031', icon:'🎨', price:89,  stock:999, reorder:50 },
+    { id:'P-105', name:'YouTube Thumbnail Bundle', sku:'THB-077', icon:'🖼️', price:25,  stock:2,   reorder:8 },
+    { id:'P-106', name:'Airbnb Host Spreadsheet Kit', sku:'ABB-052', icon:'🏠', price:35,  stock:999, reorder:50 }
+  ];
+
+  var today = new Date();
+  function daysAgo(n){ var d = new Date(today); d.setDate(d.getDate()-n); return d; }
+  function fmtDate(d){
+    return d.toLocaleDateString('en-US',{month:'short', day:'numeric'});
+  }
+
+  var orderSeq = 1042;
+  var ORDERS = [
+    { id:'#1041', customer:'Hannah Moore',   productId:'P-101', qty:1, date:daysAgo(0), status:'Paid' },
+    { id:'#1040', customer:'Daniel Reyes',   productId:'P-105', qty:2, date:daysAgo(0), status:'Pending' },
+    { id:'#1039', customer:'Priya Nair',     productId:'P-103', qty:1, date:daysAgo(1), status:'Shipped' },
+    { id:'#1038', customer:'Marcus Lee',     productId:'P-104', qty:1, date:daysAgo(2), status:'Paid' },
+    { id:'#1037', customer:'Sofia Bennett',  productId:'P-102', qty:3, date:daysAgo(3), status:'Paid' },
+    { id:'#1036', customer:'Omar Haddad',    productId:'P-106', qty:1, date:daysAgo(4), status:'Shipped' },
+    { id:'#1035', customer:'Emily Carter',   productId:'P-101', qty:1, date:daysAgo(5), status:'Paid' },
+    { id:'#1034', customer:'Liam O’Connor',  productId:'P-105', qty:1, date:daysAgo(6), status:'Cancelled' }
+  ];
+
+  var STATUSES = ['Pending','Paid','Shipped','Cancelled'];
+  var BASE_TASKS = 2; // non-order tasks (e.g. "design review", "tax filing prep")
+
+  function productById(id){ for (var i=0;i<PRODUCTS.length;i++) if (PRODUCTS[i].id===id) return PRODUCTS[i]; return PRODUCTS[0]; }
+  function orderTotal(o){ return productById(o.productId).price * o.qty; }
+  function money(n){ return '$' + n.toLocaleString('en-US'); }
+  function isCollected(o){ return o.status==='Paid' || o.status==='Shipped'; }
+
+  /* ---------------- Rendering ---------------- */
+  var ordersBody = document.getElementById('ordersBody');
+  var invDash = document.getElementById('invListDash');
+  var invFull = document.getElementById('invListFull');
+  var custList = document.getElementById('custList');
+
+  function renderOrders(){
+    ordersBody.innerHTML = '';
+    ORDERS.forEach(function(o, idx){
+      var p = productById(o.productId);
+      var tr = document.createElement('tr');
+      var itemsLabel = p.name + (o.qty > 1 ? ' × ' + o.qty : '');
+      var opts = STATUSES.map(function(s){
+        return '<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+s+'</option>';
+      }).join('');
+      tr.innerHTML =
+        '<td class="o-id">'+o.id+'</td>' +
+        '<td class="o-cust">'+o.customer+'</td>' +
+        '<td class="o-items">'+itemsLabel+'</td>' +
+        '<td style="color:var(--muted)">'+fmtDate(o.date)+'</td>' +
+        '<td><select class="status-select st-'+o.status+'" data-idx="'+idx+'">'+opts+'</select></td>' +
+        '<td class="o-total" style="text-align:right">'+money(orderTotal(o))+'</td>';
+      ordersBody.appendChild(tr);
+    });
+    var selects = ordersBody.querySelectorAll('.status-select');
+    for (var i=0;i<selects.length;i++){
+      selects[i].addEventListener('change', function(){
+        var o = ORDERS[+this.getAttribute('data-idx')];
+        o.status = this.value;
+        this.className = 'status-select st-' + this.value;
+        showToast('Order ' + o.id + ' marked as ' + this.value);
+        updateAll(false);
+      });
+    }
+  }
+
+  function invRowHTML(p){
+    var low = p.stock <= p.reorder;
+    return '<div class="inv-row'+(low?' low':'')+'">' +
+      '<div class="inv-thumb">'+p.icon+'</div>' +
+      '<div class="inv-info"><div class="inv-name">'+p.name+'</div><div class="inv-sku">SKU '+p.sku+' · '+money(p.price)+'</div></div>' +
+      '<div class="inv-stock"><div class="s-num">'+(p.stock>=999?'∞':p.stock)+'</div><div class="s-lab">in stock</div></div>' +
+      '<span class="stock-pill '+(low?'stock-low':'stock-ok')+'">'+(low?'Low stock':'In stock')+'</span>' +
+    '</div>';
+  }
+  function renderInventory(){
+    var html = PRODUCTS.map(invRowHTML).join('');
+    invDash.innerHTML = html; invFull.innerHTML = html;
+  }
+
+  function renderCustomers(){
+    var map = {};
+    ORDERS.forEach(function(o){
+      if (o.status==='Cancelled') return;
+      if (!map[o.customer]) map[o.customer] = { name:o.customer, orders:0, spent:0 };
+      map[o.customer].orders++; map[o.customer].spent += orderTotal(o);
+    });
+    var arr = Object.keys(map).map(function(k){ return map[k]; }).sort(function(a,b){ return b.spent-a.spent; });
+    custList.innerHTML = arr.map(function(c){
+      var initials = c.name.split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
+      return '<div class="cust-row"><div class="avatar">'+initials+'</div>' +
+        '<div class="cust-info"><div class="cust-name">'+c.name+'</div><div class="cust-meta">'+c.orders+' order'+(c.orders>1?'s':'')+'</div></div>' +
+        '<div class="cust-spent">'+money(c.spent)+'</div></div>';
+    }).join('');
+  }
+
+  function computeKPIs(){
+    var revenue = 0, pending = 0;
+    ORDERS.forEach(function(o){ if (isCollected(o)) revenue += orderTotal(o); if (o.status==='Pending') pending++; });
+    var low = PRODUCTS.filter(function(p){ return p.stock <= p.reorder; }).length;
+    var active = ORDERS.filter(function(o){ return o.status!=='Cancelled'; }).length;
+    return { revenue:revenue, pending:pending, low:low, active:active, tasks: BASE_TASKS + pending };
+  }
+
+  function renderKPIs(){
+    var k = computeKPIs();
+    document.getElementById('kpiRevenue').textContent = money(k.revenue);
+    document.getElementById('kpiOrders').textContent = k.active;
+    document.getElementById('kpiPendingNote').textContent = k.pending + ' pending';
+    document.getElementById('kpiLowStock').textContent = k.low;
+    document.getElementById('kpiTasks').textContent = k.tasks;
+    document.getElementById('footRevenue').textContent = money(k.revenue);
+    document.getElementById('orderCountLabel').textContent = ORDERS.length + ' orders';
+    document.getElementById('navOrderCount').textContent = ORDERS.length;
+  }
+
+  /* ---------------- Chart (pure canvas) ---------------- */
+  function dailyRevenue(){
+    var days = [];
+    for (var i=6;i>=0;i--){
+      var d = daysAgo(i), sum = 0;
+      ORDERS.forEach(function(o){
+        if (isCollected(o) && o.date.toDateString() === d.toDateString()) sum += orderTotal(o);
+      });
+      days.push({ label: i===0 ? 'Today' : d.toLocaleDateString('en-US',{weekday:'short'}), value: sum });
+    }
+    return days;
+  }
+
+  function drawChart(){
+    var canvas = document.getElementById('revChart');
+    var dpr = window.devicePixelRatio || 1;
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    if (!w) return;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0,0,w,h);
+
+    var data = dailyRevenue();
+    var total = data.reduce(function(a,b){ return a+b.value; }, 0);
+    document.getElementById('chartTotal').textContent = 'Total ' + money(total);
+    var avg = total / data.length;
+    var max = Math.max.apply(null, data.map(function(d){ return d.value; }).concat([avg, 10]));
+    max = Math.ceil(max * 1.25 / 20) * 20;
+
+    var padL = 38, padR = 10, padT = 14, padB = 26;
+    var cw = w - padL - padR, ch = h - padT - padB;
+
+    // gridlines + y labels
+    ctx.font = '11px Inter'; ctx.fillStyle = '#5F6E8C'; ctx.textAlign = 'right';
+    for (var g=0; g<=4; g++){
+      var y = padT + ch - (ch * g/4);
+      var val = Math.round(max * g/4);
+      ctx.strokeStyle = 'rgba(255,255,255,.06)';
+      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w-padR, y); ctx.stroke();
+      ctx.fillText('$'+val, padL-8, y+3.5);
+    }
+
+    // average dashed line
+    var avgY = padT + ch - (avg/max)*ch;
+    ctx.strokeStyle = 'rgba(46,218,197,.35)'; ctx.setLineDash([5,5]);
+    ctx.beginPath(); ctx.moveTo(padL, avgY); ctx.lineTo(w-padR, avgY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // bars
+    var slot = cw / data.length;
+    var bw = Math.min(44, slot * .52);
+    data.forEach(function(d, i){
+      var x = padL + slot*i + (slot-bw)/2;
+      var bh = (d.value/max) * ch;
+      var y = padT + ch - bh;
+      var grad = ctx.createLinearGradient(0, y, 0, padT+ch);
+      grad.addColorStop(0, '#2EDAC5'); grad.addColorStop(1, 'rgba(46,218,197,.35)');
+      ctx.fillStyle = grad;
+      var r = 6;
+      ctx.beginPath();
+      ctx.moveTo(x, padT+ch);
+      ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+      ctx.lineTo(x+bw-r, y); ctx.quadraticCurveTo(x+bw, y, x+bw, y+r);
+      ctx.lineTo(x+bw, padT+ch); ctx.closePath(); ctx.fill();
+      if (d.value > 0){
+        ctx.fillStyle = '#E8ECF4'; ctx.font = '600 11.5px Inter'; ctx.textAlign = 'center';
+        ctx.fillText('$'+d.value, x+bw/2, y-7);
+      }
+      ctx.fillStyle = '#93A1BC'; ctx.font = '11.5px Inter'; ctx.textAlign = 'center';
+      ctx.fillText(d.label, x+bw/2, padT+ch+17);
+    });
+  }
+
+  function updateAll(redraw){
+    renderOrders(); renderInventory(); renderCustomers(); renderKPIs();
+    if (redraw !== false) drawChart();
+  }
+
+  /* ---------------- Add order ---------------- */
+  var form = document.getElementById('addOrderForm');
+  var productSel = document.getElementById('fProduct');
+  productSel.innerHTML = PRODUCTS.map(function(p){
+    return '<option value="'+p.id+'">'+p.name+' — '+money(p.price)+'</option>';
+  }).join('');
+
+  function toggleForm(){
+    form.classList.toggle('open');
+    if (form.classList.contains('open')) document.getElementById('fCustomer').focus();
+  }
+  document.getElementById('toggleFormBtn').addEventListener('click', toggleForm);
+  document.getElementById('jumpAddOrder').addEventListener('click', function(){
+    if (!form.classList.contains('open')) toggleForm();
+    window.scrollTo({ top: document.body.scrollHeight, behavior:'smooth' });
+  });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('fCustomer').value.trim();
+    if (!name) return;
+    orderSeq++;
+    ORDERS.unshift({
+      id: '#' + orderSeq,
+      customer: name,
+      productId: productSel.value,
+      qty: Math.max(1, parseInt(document.getElementById('fQty').value, 10) || 1),
+      date: new Date(today),
+      status: document.getElementById('fStatus').value
+    });
+    document.getElementById('fCustomer').value = '';
+    document.getElementById('fQty').value = 1;
+    updateAll();
+    showToast('Order #' + orderSeq + ' added for ' + name);
+  });
+
+  /* ---------------- Toast ---------------- */
+  var toastEl = document.getElementById('toast'), toastTimer = null;
+  function showToast(msg){
+    toastEl.textContent = msg; toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2600);
+  }
+
+  /* ---------------- Nav ---------------- */
+  var navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(function(item){
+    item.addEventListener('click', function(){
+      switchView(item.getAttribute('data-view'));
+    });
+  });
+  function switchView(name){
+    navItems.forEach(function(n){ n.classList.toggle('active', n.getAttribute('data-view')===name); });
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+    document.getElementById('view-' + name).classList.add('active');
+    if (name === 'dashboard') drawChart();
+  }
+  document.querySelectorAll('[data-goto]').forEach(function(b){
+    b.addEventListener('click', function(){ switchView(b.getAttribute('data-goto')); });
+  });
+
+  /* ---------------- Settings toggles ---------------- */
+  document.querySelectorAll('[data-toggle]').forEach(function(t){
+    t.addEventListener('click', function(){ t.classList.toggle('on'); });
+  });
+
+  /* ---------------- Init ---------------- */
+  updateAll();
+  window.addEventListener('resize', drawChart);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Engineering — Proof of Work | Syed Areeb Ali · Apex Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1222; --navy2:#101A30; --panel:#141F38;
+    --line:rgba(232,236,244,.09);
+    --teal:#2EDAC5; --ink:#E8ECF4; --muted:#9AA7BD; --muted2:#C3CCDD;
+    --gold:#E8B34B;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--navy);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:'Sora',sans-serif;line-height:1.18;letter-spacing:-.01em}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .eyebrow{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--teal)}
+  .accent{color:var(--teal);font-style:italic}
+  section{padding:84px 0}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:96px 0 70px;border-bottom:1px solid var(--line)}
+  .hero .eyebrow{margin-bottom:22px}
+  .hero h1{font-size:54px;font-weight:800;max-width:820px}
+  .hero p.lede{margin-top:24px;font-size:19px;color:var(--muted2);max-width:760px}
+  .method{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:44px}
+  .method .m{background:var(--navy2);border:1px solid var(--line);border-radius:14px;padding:18px 18px 14px}
+  .method .m b{display:block;font-family:'Sora',sans-serif;font-size:14.5px;color:#fff;margin-bottom:5px}
+  .method .m span{font-size:13.5px;color:var(--muted);line-height:1.5;display:block}
+  .method .m i{font-style:normal;color:var(--teal);font-family:'Sora',sans-serif;font-size:12px;font-weight:700;letter-spacing:.14em}
+
+  /* ---------- EXAMPLES ---------- */
+  .ex-head{margin-bottom:36px}
+  .ex-head h2{font-size:36px;font-weight:700;margin-top:14px}
+  .ex-head p{color:var(--muted2);margin-top:10px;max-width:720px}
+  .stack{display:flex;flex-direction:column;gap:20px}
+  .card{border:1px solid var(--line);border-radius:18px;padding:30px 32px;background:var(--navy2)}
+  .card .tag{display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+  .card .tag::before{content:"";width:22px;height:2px;background:currentColor;display:inline-block}
+  .card.weak .tag{color:#E08A8A}
+  .card.eng .tag{color:var(--teal)}
+  .card.out .tag{color:var(--gold)}
+  .card.weak p.promptline{font-size:17px;color:var(--muted2);font-style:italic}
+  .card.weak .why{margin-top:14px;font-size:14.5px;color:var(--muted)}
+  pre{font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.7;color:#D8F3EE;background:var(--panel);border:1px solid rgba(46,218,197,.16);border-radius:12px;padding:22px 24px;white-space:pre-wrap;word-wrap:break-word}
+  pre .k{color:var(--teal);font-weight:500}
+  .out-body{color:var(--muted2);font-size:16px}
+  .out-body p{margin-bottom:14px}
+  .out-body p:last-child{margin-bottom:0}
+  .out-body strong{color:#fff}
+  .out-body ul,.out-body ol{margin:6px 0 14px 20px}
+  .out-body li{margin-bottom:7px}
+  .out-body .emailbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;color:var(--muted2)}
+  .out-body .emailbox .subj{color:#fff;font-weight:600;margin-bottom:12px}
+  .out-body table{width:100%;border-collapse:collapse;font-size:14.5px;margin:4px 0 6px}
+  .out-body th{font-family:'Sora',sans-serif;text-align:left;color:#fff;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:10px 12px;border-bottom:2px solid rgba(46,218,197,.35)}
+  .out-body td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--muted2)}
+  .out-body td:first-child{color:var(--teal);font-weight:600;white-space:nowrap}
+  .verdict{margin-top:20px;border-left:3px solid var(--teal);padding:4px 0 4px 18px;color:var(--muted2);font-size:15.5px}
+  .verdict b{color:#fff}
+  .divider{height:1px;background:var(--line);margin:0}
+
+  /* ---------- CLOSING ---------- */
+  .closing{background:var(--navy2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .diffs{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
+  .diff{border:1px solid var(--line);border-radius:16px;padding:26px 28px;background:var(--navy)}
+  .diff b{font-family:'Sora',sans-serif;font-size:17px;color:#fff;display:block;margin-bottom:8px}
+  .diff b span{color:var(--teal);margin-right:8px}
+  .diff p{color:var(--muted);font-size:15px}
+  .cta{margin-top:44px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{display:inline-block;background:var(--teal);color:#06231F;font-family:'Sora',sans-serif;font-weight:700;font-size:15.5px;padding:14px 28px;border-radius:999px;text-decoration:none}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(232,236,244,.3)}
+  footer{padding:38px 0 46px;color:var(--muted);font-size:13.5px}
+  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  @media(max-width:820px){
+    .method{grid-template-columns:1fr 1fr}
+    .diffs{grid-template-columns:1fr}
+    .hero h1{font-size:38px}
+    .card{padding:24px 20px}
+    section{padding:60px 0}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Proof of Work · Prompt Engineering</p>
+    <h1>Same AI. Same task.<br><span class="accent">A better prompt</span> changes everything.</h1>
+    <p class="lede">This page is not a claim — it is a demonstration. Below are four real tasks, each shown three ways: the weak prompt most people type, the engineered prompt I would actually write, and the output that prompt produces. Judge the skill by the work.</p>
+    <div class="method">
+      <div class="m"><i>01</i><b>Role</b><span>Who the AI should act as — an expert with a point of view, not a generic assistant.</span></div>
+      <div class="m"><i>02</i><b>Context</b><span>The situation, the audience and the facts the answer has to respect.</span></div>
+      <div class="m"><i>03</i><b>Constraints</b><span>Length, tone, what to avoid — the guardrails that stop generic filler.</span></div>
+      <div class="m"><i>04</i><b>Format</b><span>The exact structure of the answer: sections, table, bullets, word count.</span></div>
+      <div class="m"><i>05</i><b>Examples</b><span>A sample of the target quality, so "good" is defined, not guessed.</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= EXAMPLE A ================= -->
+<section>
+  <div class="wrap">
+    <div class="ex-head">
+      <p class="eyebrow">Example 01 / Product Copy</p>
+      <h2>Etsy product description for a <span class="accent">spreadsheet template</span></h2>
+      <p>The product: a Home Bakery Pricing Calculator (Excel + Google Sheets) that works out the true cost per cake — ingredients, time, packaging and overhead — and suggests a profitable selling price.</p>
+    </div>
+    <div class="stack">
+      <div class="card weak">
+        <span class="tag">The weak prompt</span>
+        <p class="promptline">"Write a product description for my cake pricing spreadsheet."</p>
+        <p class="why">Why it fails: no audience, no benefits, no structure. The AI guesses — and guesses sound like every other listing: "easy to use", "save time", "perfect for bakers". Nothing a buyer can act on.</p>
+      </div>
+      <div class="card eng">
+        <span class="tag">The engineered prompt</span>
+        <pre><span class="k">ROLE:</span> You are an Etsy copywriter who specialises in digital
+products for home-based food businesses.
+
+<span class="k">PRODUCT:</span> "Home Bakery Pricing Calculator" — an Excel and
+Google Sheets workbook. The baker enters ingredient costs,
+batch size, time spent, packaging and overhead; it calculates
+the true cost per cake and a selling price at their chosen
+profit margin. Includes a price list tab and an order tracker.
+
+<span class="k">AUDIENCE:</span> Home bakers selling from Instagram and WhatsApp
+who currently price by guessing or copying competitors.
+
+<span class="k">WRITE:</span> An Etsy listing description with this structure:
+1. A one-line hook naming the pricing problem (max 15 words)
+2. "What it does" — 4 bullets, each starting with a verb,
+   each tied to a money outcome, not a feature
+3. "What's inside" — list the tabs
+4. "Who it's for / not for" — 2 lines each, be honest
+5. Requirements line (Excel or Google Sheets, instant download)
+
+<span class="k">CONSTRAINTS:</span> Under 220 words total. No hype words
+("revolutionary", "game-changer", "must-have"). No income
+guarantees. Friendly, plain English a non-native speaker
+reads easily. Use "you" throughout.</pre>
+      </div>
+      <div class="card out">
+        <span class="tag">The output</span>
+        <div class="out-body">
+          <p><strong>Stop guessing your cake prices — know exactly what each one costs you.</strong></p>
+          <p><strong>What it does</strong></p>
+          <ul>
+            <li><strong>Calculates</strong> your true cost per cake — ingredients, your time, packaging and overhead included</li>
+            <li><strong>Shows</strong> the selling price you need for the profit margin you choose</li>
+            <li><strong>Flags</strong> the recipes that are quietly losing you money</li>
+            <li><strong>Tracks</strong> every order and payment in one place, so nothing gets forgotten</li>
+          </ul>
+          <p><strong>What's inside:</strong> Pricing Calculator · Ingredient Cost Library · Price List · Order Tracker · Simple dashboard</p>
+          <p><strong>Who it's for:</strong> home bakers who sell regularly and price by feel. <strong>Not for:</strong> bakeries with POS software, or anyone wanting a recipe book — this is a numbers tool.</p>
+          <p><strong>Requirements:</strong> Microsoft Excel or a free Google account for Google Sheets. Instant download, works on Windows, Mac and phone.</p>
+        </div>
+        <p class="verdict"><b>What changed:</b> the weak prompt produces adjectives; the engineered prompt produces a buying decision — a named problem, money outcomes, honest limits, and a format a skimming buyer can scan in 20 seconds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ================= EXAMPLE B ================= -->
+<section>
+  <div class="wrap">
+    <div class="ex-head">
+      <p class="eyebrow">Example 02 / Business Email</p>
+      <h2>A polite but firm <span class="accent">late-payment</span> follow-up</h2>
+      <p>The situation every freelancer knows: an invoice 14 days overdue, a good client relationship worth protecting, and a payment that still needs to arrive this week.</p>
+    </div>
+    <div class="stack">
+      <div class="card weak">
+        <span class="tag">The weak prompt</span>
+        <p class="promptline">"Write an email asking my client to pay my invoice."</p>
+        <p class="why">Why it fails: the AI doesn't know the amount, the dates, or the relationship — so it writes something either apologetic and weak ("sorry to bother you…") or cold and threatening. Both damage the freelancer.</p>
+      </div>
+      <div class="card eng">
+        <span class="tag">The engineered prompt</span>
+        <pre><span class="k">ROLE:</span> You are a professional freelancer writing to a
+valued client. Your tone: warm, confident, zero apology
+for asking — this is business, handled gracefully.
+
+<span class="k">FACTS:</span>
+- Client: Sarah, owner of a small marketing studio
+- Work delivered: social media template pack, delivered
+  and approved on 28 September
+- Invoice: #INV-014, $350, due 6 October — now 14 days overdue
+- One friendly reminder already sent on 9 October, no reply
+- Goal: payment this week, relationship fully intact,
+  door open for the next project
+
+<span class="k">WRITE:</span> An email of 120–150 words:
+1. Subject line — factual, includes the invoice number
+2. Open with the delivered work, positively, one line
+3. State the fact plainly: invoice number, amount, due date
+4. Make paying effortless: "reply to this email and I'll
+   resend the payment link"
+5. One gentle consequence, framed as process not threat:
+   new work pauses until open invoices are cleared
+6. Close warmly, referencing future work together
+
+<span class="k">CONSTRAINTS:</span> No "just checking in", no "sorry", no
+exclamation marks, no legal language. Short paragraphs.</pre>
+      </div>
+      <div class="card out">
+        <span class="tag">The output</span>
+        <div class="out-body">
+          <div class="emailbox">
+            <p class="subj">Subject: Invoice #INV-014 — $350, due 6 October</p>
+            <p>Hi Sarah,</p>
+            <p>Glad the template pack landed well with your team — it was a pleasure putting it together.</p>
+            <p>I'm writing about invoice #INV-014 for $350, which was due on 6 October and is still open. It may simply have slipped through, so I've kept this short: reply to this email and I'll resend the payment link right away.</p>
+            <p>One housekeeping note — I schedule new projects once open invoices are cleared, so settling this week keeps us on track for the November work we discussed.</p>
+            <p>Thank you, and speak soon.</p>
+            <p>Best regards,<br>Areeb</p>
+          </div>
+        </div>
+        <p class="verdict"><b>What changed:</b> every fact the email needs was supplied, so nothing is vague. The "consequence" is framed as scheduling policy, not a threat — firm on the money, warm on the relationship.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ================= EXAMPLE C ================= -->
+<section>
+  <div class="wrap">
+    <div class="ex-head">
+      <p class="eyebrow">Example 03 / Content Planning</p>
+      <h2>A week of LinkedIn ideas for a <span class="accent">cleaning business</span></h2>
+      <p>The owner of a small cleaning company wants LinkedIn visibility with local businesses — offices, clinics, property managers — not generic "content". One post a day, Monday to Friday.</p>
+    </div>
+    <div class="stack">
+      <div class="card weak">
+        <span class="tag">The weak prompt</span>
+        <p class="promptline">"Give me LinkedIn post ideas for a cleaning company."</p>
+        <p class="why">Why it fails: no audience, no goal, no formats. The result is motivational filler — "Monday motivation!", "meet our team!" — that no office manager has ever hired a cleaner from.</p>
+      </div>
+      <div class="card eng">
+        <span class="tag">The engineered prompt</span>
+        <pre><span class="k">ROLE:</span> You are a B2B content strategist for local
+service businesses.
+
+<span class="k">BUSINESS:</span> BrightNest Cleaning — 6-person team cleaning
+offices, dental clinics and rental properties in one city.
+Owner posts personally, 15 minutes a day maximum.
+
+<span class="k">AUDIENCE &amp; GOAL:</span> Office managers, clinic owners and
+letting agents on LinkedIn. Goal is enquiries, not likes.
+Every idea must either prove competence, show a real
+cost of dirty workplaces, or teach one useful thing.
+
+<span class="k">WRITE:</span> 5 post ideas, Monday to Friday, as a table:
+Day | Hook (the exact first line, under 12 words) |
+Format (text / photo / 30-sec video / poll) | The post in
+2 sentences | Soft call to action
+
+<span class="k">RULES:</span>
+- Rotate formats: no two days the same
+- At least one idea uses a real number or a before/after
+- At least one is a story about a specific job (no client
+  names)
+- No motivational quotes, no "happy Monday", no hashtag
+  lists inside the hooks
+- Ideas must be filmable/writable in 15 minutes</pre>
+      </div>
+      <div class="card out">
+        <span class="tag">The output</span>
+        <div class="out-body">
+          <table>
+            <tr><th>Day</th><th>Hook</th><th>Format</th><th>The post</th><th>CTA</th></tr>
+            <tr><td>Mon</td><td>"Your office kitchen is costing you staff."</td><td>Text</td><td>A short breakdown of a real survey stat: shared kitchens are the #1 complaint in office feedback — and the cheapest one to fix.</td><td>"When did yours last get a deep clean?"</td></tr>
+            <tr><td>Tue</td><td>"This clinic reception took 40 minutes to reset."</td><td>Before/after photo</td><td>Two photos from a permitted job, one line on what a patient-ready reception actually involves behind the scenes.</td><td>"Clinics: we do out-of-hours. DM for a walkthrough."</td></tr>
+            <tr><td>Wed</td><td>"We lost a contract in March. Here's why."</td><td>Text story</td><td>An honest story: a client left over missed bins — and the checklist system the team built so it never happens again.</td><td>"What would make you fire your cleaner?"</td></tr>
+            <tr><td>Thu</td><td>"What does office cleaning actually cost per desk?"</td><td>30-sec video</td><td>Owner on camera, one number explained: cost per desk per month, and what changes the price up or down.</td><td>"Want the number for your office size? Comment the headcount."</td></tr>
+            <tr><td>Fri</td><td>"Property managers: your 24-hour turnover checklist"</td><td>Poll + checklist</td><td>A 6-item end-of-tenancy checklist as a text post, ending with a poll: which item gets missed most often?</td><td>"Save this for your next move-out."</td></tr>
+          </table>
+        </div>
+        <p class="verdict"><b>What changed:</b> each idea now has a buyer, a proof point and a reply path. "Content" became a quiet sales system the owner can run in 15 minutes a day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ================= EXAMPLE D ================= -->
+<section>
+  <div class="wrap">
+    <div class="ex-head">
+      <p class="eyebrow">Example 04 / Operations</p>
+      <h2>Messy meeting notes → a <span class="accent">clean action list</span></h2>
+      <p>Raw notes from a 30-minute call about a website redesign — half-sentences, names, dates and decisions all mixed together. The team needs tasks, owners and deadlines, nothing else.</p>
+    </div>
+    <div class="stack">
+      <div class="card weak">
+        <span class="tag">The weak prompt</span>
+        <p class="promptline">"Summarise these meeting notes."</p>
+        <p class="why">Why it fails: a summary repeats the mess in nicer sentences. Nobody can work from it — owners are implied, deadlines stay buried in prose, and decisions blur into discussion.</p>
+      </div>
+      <div class="card eng">
+        <span class="tag">The engineered prompt</span>
+        <pre><span class="k">ROLE:</span> You are an operations assistant who turns raw
+notes into task lists a team can execute without questions.
+
+<span class="k">INPUT:</span> The meeting notes pasted below this prompt.
+
+<span class="k">WRITE</span> exactly three sections, in this order:
+1. <span class="k">DECISIONS</span> — bullet list, only things clearly decided,
+   one line each. If it was discussed but not decided,
+   it does not belong here.
+2. <span class="k">ACTIONS</span> — a table: Task | Owner | Deadline.
+   Task starts with a verb. Take the owner and date from
+   the notes exactly as written. If no date is given,
+   write "— not set" instead of inventing one.
+3. <span class="k">OPEN QUESTIONS</span> — anything mentioned but unresolved,
+   phrased as a question, with who should answer it.
+
+<span class="k">CONSTRAINTS:</span>
+- Use ONLY facts from the notes. Never invent a date,
+  name, number or decision.
+- If a note is ambiguous, put it in Open Questions —
+  do not guess.
+- No introduction, no conclusion, no commentary.
+  The three sections only.</pre>
+      </div>
+      <div class="card out">
+        <span class="tag">The output</span>
+        <div class="out-body">
+          <p><strong>Sample input (the messy notes):</strong> <em>"call w/ danish + priya — homepage redesign, launch before diwali sale. danish said hero section new banner needed, he'll design by fri. priya: product pages loading slow, needs dev help, ask areeb?? budget approved 40k for photoshoot — decided. checkout page complaints — tabled, decide next week. priya to send brand files to danish today. sale dates not final, marketing to confirm. danish — mobile menu broken on android, fix urgent."</em></p>
+          <p><strong>DECISIONS</strong></p>
+          <ul>
+            <li>Homepage redesign to launch before the Diwali sale</li>
+            <li>Photoshoot budget of 40,000 approved</li>
+            <li>Checkout page discussion postponed to next week</li>
+          </ul>
+          <p><strong>ACTIONS</strong></p>
+          <table>
+            <tr><th>Task</th><th>Owner</th><th>Deadline</th></tr>
+            <tr><td>Design new hero banner</td><td>Danish</td><td>Friday</td></tr>
+            <tr><td>Send brand files to Danish</td><td>Priya</td><td>Today</td></tr>
+            <tr><td>Fix broken mobile menu on Android</td><td>Danish</td><td>— not set (marked urgent)</td></tr>
+            <tr><td>Investigate slow product-page loading</td><td>Priya</td><td>— not set</td></tr>
+          </table>
+          <p><strong>OPEN QUESTIONS</strong></p>
+          <ul>
+            <li>Who will handle the dev work for the slow product pages — Priya flagged "ask Areeb?" but it wasn't confirmed</li>
+            <li>What are the final Diwali sale dates? (Marketing to confirm)</li>
+            <li>What is the deadline for the Android menu fix, given it's marked urgent?</li>
+          </ul>
+        </div>
+        <p class="verdict"><b>What changed:</b> the constraint "never invent a date" is the whole game. The AI flagged the unconfirmed owner instead of silently assigning the task — an output the team can trust without re-reading the raw notes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLOSING ================= -->
+<section class="closing">
+  <div class="wrap">
+    <p class="eyebrow">The Difference</p>
+    <h2 style="font-size:34px;margin-top:14px">What changes with an <span class="accent">engineered prompt</span></h2>
+    <div class="diffs">
+      <div class="diff"><b><span>01</span>Specificity</b><p>Real facts go in — amounts, dates, names, audience — so real answers come out. A weak prompt forces the AI to guess, and guesses are what make AI writing sound like AI writing.</p></div>
+      <div class="diff"><b><span>02</span>Format control</b><p>The answer arrives in the shape you need: a scannable listing, a 140-word email, a table, a three-section task list. No re-editing a wall of text into something usable.</p></div>
+      <div class="diff"><b><span>03</span>Tone on purpose</b><p>"Polite but firm", "warm, zero apology", "no hype words" — tone is specified like a setting, not hoped for. The same task can produce five different voices, each deliberate.</p></div>
+      <div class="diff"><b><span>04</span>Reusable as a system</b><p>An engineered prompt is an asset. Save it, and next month's invoice chase, listing or meeting notes take two minutes — same quality, every time. That is the difference between a trick and a workflow.</p></div>
+    </div>
+    <div class="cta">
+      <a class="btn" href="https://www.fiverr.com/nextgencreator2" target="_blank" rel="noopener">Work with me on Fiverr</a>
+      <a class="btn ghost" href="https://www.linkedin.com/in/syed-areeb-ali-notion" target="_blank" rel="noopener">Connect on LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Syed Areeb Ali · Apex Digital</span>
+    <span>Prompt Engineering — Proof of Work. Every output on this page was produced from the prompt shown above it.</span>
+  </div>
+</footer>
+
+</body>
+</html>
